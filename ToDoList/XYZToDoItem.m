@@ -30,4 +30,22 @@
         self.completionDate = nil;
 }
 
+// NSCoding Protocol implementation
+
+- (void) encodeWithCoder:(NSCoder *) encoder
+{
+    [encoder encodeObject: _itemName forKey: @"toDoItemName"];
+    [encoder encodeBool: _completed forKey: @"toDoItemCompleted"];
+    [encoder encodeObject: _completionDate forKey: @"toDoItemCompletionDate"];
+}
+
+- (id) initWithCoder:(NSCoder *) decoder
+{
+    _itemName = [decoder decodeObjectForKey: @"toDoItemName"];
+    _completed = [decoder decodeBoolForKey: @"toDoItemCompleted"];
+    _completionDate = [decoder decodeObjectForKey: @"toDoItemCompletionDate"];
+    
+    return self;
+}
+
 @end

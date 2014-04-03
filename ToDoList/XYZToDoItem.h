@@ -8,11 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
-@interface XYZToDoItem : NSObject
+@interface XYZToDoItem : NSObject <NSCoding>
 
 @property NSString *itemName;
 @property BOOL completed;
-@property (readonly) NSDate *creationDate;
 
 -(void) markAsCompleted: (BOOL) isComplete;
 

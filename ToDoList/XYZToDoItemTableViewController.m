@@ -14,6 +14,9 @@
 
 @property NSMutableArray *toDoItems, *completedToDoItems;
 
+-(void) archive;
+-(void) unarchive;
+
 @end
 
 @implementation XYZToDoItemTableViewController
@@ -27,11 +30,14 @@
     if (item != nil){
         [self.toDoItems addObject: item];
         [self.tableView reloadData];
+        [self archive];
     }
 }
 
 - (void) loadInitialData
 {
+    [self unarchive];
+    /*
     XYZToDoItem *item1 = [[XYZToDoItem alloc] init];
     item1.itemName = @"Buy Candles";
     [self.toDoItems addObject: item1];
@@ -43,6 +49,7 @@
     XYZToDoItem *item3 = [[XYZToDoItem alloc] init];
     item3.itemName = @"Sharpen Athame";
     [self.toDoItems addObject: item3];
+     */
     
 }
 
@@ -55,7 +62,7 @@
     return self;
 }
 
-- (void)viewDidLoad
+- (void) viewDidLoad
 {
     [super viewDidLoad];
     self.toDoItems = [[NSMutableArray alloc] init];
@@ -146,6 +153,7 @@
         else
             [self.completedToDoItems removeObjectAtIndex: indexPath.row];
         
+        [self archive];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 
     } /*else if (editingStyle == UITableViewCellEditingStyleInsert) {
@@ -201,7 +209,39 @@
         [self.toDoItems addObject: tappedItem];
         [self.completedToDoItems removeObjectAtIndex: indexPath.row];
     }
+    [self archive];
     [tableView reloadData];
+}
+
+- (void) archive
+{
+    NSURL *dataFileURL = [[[[NSFileManager defaultManager] URLsForDirectory: NSDocumentDirectory inDomains: NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"toDoData"];
+
+    NSMutableData *dataArea = [NSMutableData data];
+    NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData: dataArea];
+    
+    [archiver encodeObject: _toDoItems forKey:@"ToDoItems"];
+    [archiver encodeObject: _completedToDoItems forKey: @"CompletedToDoItems"];
+    [archiver finishEncoding];
+    
+    if ([dataArea writeToFile: [dataFileURL path] atomically: YES] == NO)
+        NSLog (@"Archiving Failed");
+    
+}
+
+- (void) unarchive
+{
+    NSURL *dataFileURL = [[[[NSFileManager defaultManager] URLsForDirectory: NSDocumentDirectory inDomains: NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"toDoData"];
+    
+    NSData *dataArea = [NSData dataWithContentsOfFile: [dataFileURL path]];
+    if (!dataArea)
+        NSLog(@"Read data failed");
+
+    NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData: dataArea];
+    
+    self.toDoItems = [unarchiver decodeObjectForKey: @"ToDoItems"];
+    self.completedToDoItems = [unarchiver decodeObjectForKey: @"CompletedToDoItems"];
+    [unarchiver finishDecoding];
 }
 
 @end
