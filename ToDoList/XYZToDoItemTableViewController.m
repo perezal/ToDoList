@@ -34,25 +34,6 @@
     }
 }
 
-- (void) loadInitialData
-{
-    [self unarchive];
-    /*
-    XYZToDoItem *item1 = [[XYZToDoItem alloc] init];
-    item1.itemName = @"Buy Candles";
-    [self.toDoItems addObject: item1];
-    
-    XYZToDoItem *item2 = [[XYZToDoItem alloc] init];
-    item2.itemName = @"Perform Seance";
-    [self.toDoItems addObject: item2];
-    
-    XYZToDoItem *item3 = [[XYZToDoItem alloc] init];
-    item3.itemName = @"Sharpen Athame";
-    [self.toDoItems addObject: item3];
-     */
-    
-}
-
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
@@ -68,7 +49,7 @@
     self.toDoItems = [[NSMutableArray alloc] init];
     self.completedToDoItems = [[NSMutableArray alloc] init];
     
-    [self loadInitialData];
+    [self unarchive];
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -87,13 +68,11 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    /*if ([self.toDoItems count] != 0 && [self.completedToDoItems count] != 0)
-        return 2;
-    else if ([self.toDoItems count] != 0 || [self.completedToDoItems count] != 0)
+    // eliminates the superfluous section header when either toDoItems array is empty
+    if ([self.completedToDoItems count] == 0)
         return 1;
     else
-        return 1;*/
-    return 2;
+        return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -134,7 +113,7 @@
     return cell;
 }
 
-
+# pragma mark - Edit button methods
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -212,6 +191,8 @@
     [self archive];
     [tableView reloadData];
 }
+
+# pragma mark - archival methods
 
 - (void) archive
 {
