@@ -54,25 +54,28 @@
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
+    return 2;
+    /*
     // eliminates the superfluous section header when either toDoItems array is empty
+    // currently not working with present didSelectRowAtIndexPath
     if ([self.completedToDoItems count] == 0)
         return 1;
     else
         return 2;
+     */
+    
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -108,7 +111,6 @@
         cell.textLabel.text = toDoItem.itemName;
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     }
-    // Configure the cell...
     
     return cell;
 }
@@ -117,13 +119,11 @@
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Return NO if you do not want the specified item to be editable.
     return YES;
 }
 
 
 
-// Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
@@ -141,33 +141,6 @@
 }
 
 
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 #pragma mark - Table view delegate
 
 
@@ -178,18 +151,28 @@
 
     if (indexPath.section == 0){
         XYZToDoItem *tappedItem = [self.toDoItems objectAtIndex: indexPath.row];
+        
         tappedItem.completed = !tappedItem.completed;
+        [tableView cellForRowAtIndexPath: indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
+        
         [self.completedToDoItems addObject: tappedItem];
         [self.toDoItems removeObjectAtIndex: indexPath.row];
+        
+        [tableView moveRowAtIndexPath:indexPath toIndexPath: [NSIndexPath indexPathForRow:[self.completedToDoItems indexOfObject: tappedItem] inSection:1]];
     }
     else if (indexPath.section == 1){
         XYZToDoItem *tappedItem = [self.completedToDoItems objectAtIndex: indexPath.row];
+        
         tappedItem.completed = !tappedItem.completed;
+        [tableView cellForRowAtIndexPath: indexPath].accessoryType = UITableViewCellAccessoryNone;
+        
         [self.toDoItems addObject: tappedItem];
         [self.completedToDoItems removeObjectAtIndex: indexPath.row];
+        
+        [tableView moveRowAtIndexPath:indexPath toIndexPath: [NSIndexPath indexPathForRow:[self.toDoItems indexOfObject: tappedItem] inSection:0]];
     }
     [self archive];
-    [tableView reloadData];
+    //[tableView reloadData];
 }
 
 # pragma mark - archival methods
